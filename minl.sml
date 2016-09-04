@@ -28,8 +28,8 @@ fun eval (env: Env) (exp : Exp) : Val = case exp of
       Closure (fn argval =>
         let val newenv = (argname, argval) :: env (* use host language closure *)
         in eval newenv exp end)
-  | Apply (f, exp) =>
-      let val closure = eval env f
+  | Apply (funexp, exp) =>
+      let val closure = eval env funexp
           val argument = eval env exp
       in case closure of (Closure f) => f argument
                        | _ => Error end
