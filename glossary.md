@@ -43,6 +43,13 @@ We use bind things to names so we can refer to them using names instead of repea
 
 The mapping from a name to the thing it refers to.
 
+To "bind something to a name" means "to attach a name to something". Like putting a tag on it.
+
+We usually bind expressions (including functions) and their types to names so we can use them later by name, without having to type them again and again.
+
+A binding, aka variable definition, extends the (static and dynamic) environment with a new name.
+Later, when we use the name, the (static) type and (dynamic) value bound to the name can be looked up in the environment.
+
 
 ### Scope
 
@@ -112,7 +119,7 @@ A whole number.
 
 **Syntax**: `~?[0-9]+`
 
-**Statics**: has type int
+**Statics**: => int
 
 **Dynamics**: value is the integer denoted by the decimal digits
 
@@ -125,7 +132,7 @@ A piece of text.
 
 **Syntax**: `".*"`
 
-**Statics**: has type string
+**Statics**: => string
 
 **Dynamics**: value is the string denoted by the characters between quotes
 
@@ -136,11 +143,11 @@ Note: it's a bit more complex, escape sequences are supported
 
 e.g. `[1, 2, 3]`, `["He", "llo"]`, `[]`
 
-**Syntax** : `[` *e1* (`,` *e2* ... )? )? `]`
+**Syntax** : `[` ( *e1* ( `,` *e2* ... )? )? `]` -- *e1*, *e2*, ... *en* are expressions
 
-**Statics**: e1 : t; e2 : t; ...  =>  [e1, e2, ...] : list of t
+**Statics**: *e1*:*t*; *e2*:*t*; ...  =>  [e1, e2, ...] : list of *t*
 
-**Dynamic**: Cons (e1, Cons (e2, ... Cons (en, nil)))
+**Dynamic**: Cons (eval *e1*, Cons (eval *e2*, ... Cons (eval *en*, nil)))
 
 
 ### Variable (Name)
@@ -162,7 +169,7 @@ e.g. `if x = 0 then "zero" else "nonzero"`
 
 Use a boolean value to choose one of two expressions to evaluate.
 
-**Syntax** : `if` *pred* `then` *e1* `else` *e2*  -- (*pred*, *e1*, *e2* are expressions)
+**Syntax** : `if` *pred* `then` *e1* `else` *e2*  -- *pred*, *e1*, *e2* are expressions
 
 **Statics** : *pred* : bool; *e1* : *t*; *e2* : *t*  =>  (if *pred* then *e1* else *e2*) : *t*
 
@@ -178,7 +185,7 @@ Evaluate the argument, then evaluate the function body in the environment at its
 
 **Syntax**: *f* *e*  (*f* and *e* are expressions)
 
-**Static**: *f* : *a* -> *b*; *e* : *a*  ==>  *f* *e* : *b*
+**Static**: *f* : *t1* -> *t2*; *e* : *t1*  ==>  *f* *e* : *t2*
 
 **Dynamics** : ??
 
@@ -189,9 +196,9 @@ eg. `2 + 3`
 
 Apply the operator to the operands.
 
-**Syntax**: e1 op e2  (e1, e2 are expressions, op is an operator)
+**Syntax**: e1 op e2  (*e1*, *e2* are expressions, *op* is an operator)
 
-**Statics**: op : a * b -> c; e1 : a ; e2 : b  =>  e1 op e2 : c
+**Statics**: *op* : *t1* * *t2* -> *t3*; *e1* : *t1* ; *e2* : *t2*  =>  *e1* *op* *e2* : *t3*
 
 **Dynamics**: evaluate e1 and e2, apply op to them
 
@@ -202,23 +209,16 @@ eg. `let x = (39 + 1) in x + 2 end`
 
 Evaluate the expression in an environment extended with some bindings.
 
-**Syntax**: "let" bindings "in" e "end"  (bindings is a list of bindings, e is an expression)
+**Syntax**: "let" *bindings* "in" *e* "end"  -- *bindings* is a list of bindings, *e* is an expression)
 
-**Statics**: the env is extended with the bindings
+**Statics**: the environment insite *e* is extended with the bindings
 
-**Dynamics**: add the bindings to the env, evaluate e
+**Dynamics**: evaluate *e* in an environment extended with the bindings
 
 
 ## Binding
 
-To "bind something to a name" means "to attach a name to something". Like putting a tag on it.
-
-We usually bind expressions (including functions) to names so we can use them later by name, without having to type them again and again.
-
-A binding, aka variable definition, extends the (static and dynamic) environment with a new name.
-Later, when we use the name, the (static) type and (dynamic) value bound to the name can be looked up in the environment.
-
-The region of code where the environment is extended with the binding - where the name is visible - is called the binding's (variable's) scope.
+ML has value and function bindings.
 
 
 ### Identifier (syntax only)
