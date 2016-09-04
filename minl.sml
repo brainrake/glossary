@@ -5,7 +5,7 @@ Our Language MinL
 datatype Val = ValBool of bool
              | ValInt of int
              | ValStr of string
-             | Closure of (Val -> Val) (* env kept in host language closure *)
+             | Closure of (Val -> Val) (* pass env through host language closure *)
              | Error
 
 datatype Exp = Lambda of (string * Exp)
@@ -17,12 +17,11 @@ datatype Exp = Lambda of (string * Exp)
 
 type Env = (string * Val) list
 
-fun lookup (env : Env) (name : string) : Val =
-  if null env
-  then Error
-  else if name = #1 (hd env)
-       then #2 (hd env)
-       else lookup (tl env) name
+fun lookup (env : Env) (name : string) : Val = case env of
+  Nil => Error
+  (name', value) :: env' => if name = name'
+                            then value
+                            else lookup env' name
 
 fun eval (env: Env) (exp : Exp) : Val = case exp of
     Lambda (argname, exp) =>
