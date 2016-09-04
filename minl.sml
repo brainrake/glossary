@@ -17,12 +17,13 @@ datatype Exp = Lambda of (string * Exp)
 
 type Env = (string * Val) list
 
-fun lookup (env : Env, name : string) =
+(* lookup : Env * string -> Val *)
+fun lookup (env, name) =
   if name = #1 (hd env)
   then #2 (hd env)
   else lookup (tl env, name)
 
-(* eval : Env, Exp) -> Val *)
+(* eval : Env * Exp -> Val *)
 fun eval (env, exp) = case exp of
     Lambda (argname, exp) =>
       Closure (env, fn argval =>
