@@ -22,8 +22,8 @@ fun lookup (env : Env, name : string) =
   then #2 (hd env)
   else lookup (tl env, name)
 
-(* eval : (Env, Exp) -> Val *)
-fun eval (env : Env, exp) = case exp of
+(* eval : Env, Exp) -> Val *)
+fun eval (env, exp) = case exp of
     Lambda (argname, exp) =>
       Closure (env, fn argval =>
         let val newenv = (argname, argval) :: env
