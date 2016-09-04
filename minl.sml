@@ -5,7 +5,7 @@ Our Language MinL
 datatype Val = ValBool of bool
              | ValInt of int
              | ValStr of string
-             | Closure of ((string * Val) list * (Val -> Val))   (* runtime only*)
+             | Closure of (Val -> Val)
              | Error
 
 datatype Exp = Lambda of (string * Exp)
@@ -17,22 +17,20 @@ datatype Exp = Lambda of (string * Exp)
 
 type Env = (string * Val) list
 
-(* lookup : Env * string -> Val *)
-fun lookup (env, name) =
+fun lookup (env : Env, name : string) : Val =
   if name = #1 (hd env)
   then #2 (hd env)
   else lookup (tl env, name)
 
-(* eval : Env * Exp -> Val *)
-fun eval (env, exp) = case exp of
+fun eval (env: Env, exp : Exp) : Val = case exp of
     Lambda (argname, exp) =>
-      Closure (env, fn argval =>
+      Closure (fn argval =>
         let val newenv = (argname, argval) :: env
         in eval (newenv, exp) end)
   | Apply (f, exp) =>
       let val closure = eval (env, f)
           val argument = eval (env, exp)
-      in case closure of (Closure (env, f)) => f argument
+      in case closure of (Closure f) => f argument
                        | _ => Error end
   | Var name => lookup (env, name)
   | If (pred, exp1, exp2) => (
@@ -52,7 +50,7 @@ the language's standard environment
 
 fun plus_ml x y = x + y
 
-val plus = Closure ([], fn x => Closure ([], fn y =>
+val plus = Closure (fn x => Closure (fn y =>
   case (x, y) of (ValInt vx, ValInt vy) => ValInt (vx + vy)
                | (_, _) => Error))
 
