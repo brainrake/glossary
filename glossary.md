@@ -12,7 +12,7 @@ We define language constructs like this:
 
 **Statics**: premises ⊢ conclusions
 
-**Dynamics**: `eval (*construct* *args*) = ...`
+**Dynamics**: `eval (construct (args...)) = ...`
 
 
 ## Language Constructs - Syntax
