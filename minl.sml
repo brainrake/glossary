@@ -5,7 +5,7 @@ Our Language MinL
 datatype Val = ValBool of bool
              | ValInt of int
              | ValStr of string
-             | Closure of (Val -> Val)
+             | Closure of (Val -> Val) (* env kept in host language closure *)
              | Error
 
 datatype Exp = Lambda of (string * Exp)
@@ -17,36 +17,36 @@ datatype Exp = Lambda of (string * Exp)
 
 type Env = (string * Val) list
 
-fun lookup (env : Env, name : string) : Val =
+fun lookup (env : Env) (name : string) : Val =
   if name = #1 (hd env)
   then #2 (hd env)
-  else lookup (tl env, name)
+  else lookup (tl env) name
 
-fun eval (env: Env, exp : Exp) : Val = case exp of
+fun eval (env: Env) (exp : Exp) : Val = case exp of
     Lambda (argname, exp) =>
       Closure (fn argval =>
-        let val newenv = (argname, argval) :: env
-        in eval (newenv, exp) end)
+        let val newenv = (argname, argval) :: env (* use host language closure *)
+        in eval newenv exp end)
   | Apply (f, exp) =>
-      let val closure = eval (env, f)
-          val argument = eval (env, exp)
+      let val closure = eval env f
+          val argument = eval env exp
       in case closure of (Closure f) => f argument
                        | _ => Error end
-  | Var name => lookup (env, name)
+  | Var name => lookup env name
   | If (pred, exp1, exp2) => (
-      case eval (env, pred) of
-          ValBool true => eval (env, exp1)
-        | ValBool false => eval (env, exp2)
+      case eval env pred of
+          ValBool true => eval env exp1
+        | ValBool false => eval env exp2
         | _ => Error)
   | Let (name, exp1, exp2) =>
-      let val newenv = (name, eval (env, exp1)) :: env
-      in eval (newenv, exp2) end
+      let val newenv = (name, eval env exp1) :: env
+      in eval newenv exp2 end
   | Literal value => value
+
 
 (*
 the language's standard environment
 *)
-
 
 fun plus_ml x y = x + y
 
@@ -71,4 +71,4 @@ val exp =
   (*in*) (Apply (Var "twice", Literal (ValInt 3))) (*end*))
 
 (* evaluate the expression in MinL *)
-val result = eval (stdenv, exp)
+val result = eval stdenv exp
