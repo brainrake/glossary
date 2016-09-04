@@ -1,0 +1,3 @@
+let twice = fn x => plus x x in
+let thrice = fn x => plus x ( twice x ) in
+thrice 3

@@ -79,8 +79,11 @@ parser
 *)
 
 fun parse_one ts =
-  if null ts orelse (hd ts = "in")
+  if null ts orelse (hd ts = "in") orelse (hd ts = "=>") orelse (hd ts = ")")
   then (Literal Error, ts)
+  else if hd ts = "("
+  then let val (exp, rest) = parse (tl ts)
+       in (exp, tl rest) end
   else if hd ts = "let"
   then let val name = hd (tl ts)
            val (exp1, rest) = parse (tl (tl (tl ts)))
@@ -95,6 +98,7 @@ fun parse_one ts =
   else if Char.isAlpha (hd (explode (hd ts)))
   then (Var (hd ts), tl ts)
   else (Literal Error, ts)
+  (* TODO: if, parens, literals *)
 
 and parse_ap exp1 ts =
   let val (exp2, rest2) = parse_one ts
@@ -106,10 +110,18 @@ and parse ts =
   let val (exp, rest) = parse_one ts
   in parse_ap exp rest end
 
-fun tokenize str = String.tokens (fn c => c = #" ") str
+fun tokenize str =
+  String.tokens (fn c => c = #" " orelse c = #"\n") str
 
-fun compile str = #1 (parse (tokenize str))
+fun compileStr str = #1 (parse (tokenize str))
 
-val exp' = compile "let twice = fn x => plus x x in twice 3"
+val exp' = compileStr "let twice = fn x => plus x x in let thrice = fn x => plus x (twice x) in thrice 3"
 
 val result' = eval stdenv exp'
+
+fun compileFile filename =
+  compileStr (TextIO.inputAll (TextIO.openIn filename))
+
+val exp'' = compileFile "test.minl"
+
+val result'' = eval stdenv exp''
