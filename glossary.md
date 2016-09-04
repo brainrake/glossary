@@ -109,7 +109,7 @@ eg. `42`
 
 A whole number.
 
-Syntax: '\~?[0-9]+'
+Syntax: `~?[0-9]+`
 
 Statics: has type int
 
@@ -122,7 +122,7 @@ e.g. `"Hello, World!"`
 
 A piece of text.
 
-Syntax: '".*"'
+Syntax: `".*"`
 
 Statics: has type string
 
@@ -135,7 +135,7 @@ Note: it's a bit more complex, escape sequences are supported
 
 e.g. `[1, 2, 3]`, `["He", "llo"]`, `[]`
 
-Syntax : '[' (e1 (',' e2 ... )? )?
+Syntax : `[` *e1* (`,` *e2* ... )? )? `]`
 
 Statics : e1 : t; e2 : t; ...  =>  [e1, e2, ...] : list of t
 
@@ -148,7 +148,7 @@ e.g. `x`, `length`, `append`, `my_var`, `Cons`
 
 A name to be looked up in the environment.
 
-Syntax : varname  (varname is an identifier)
+Syntax : *varname*  (varname is an identifier)
 
 Static : get `varname`'s type from env
 
@@ -161,7 +161,7 @@ e.g. `if x = 0 then "zero" else "nonzero"`
 
 Do either one thing or another, depending on a boolean value.
 
-Syntax : 'if' pred 'then' e1 'else' e2   (p, e1, e2 are expressions)
+Syntax : `if` *pred* `then` *e1* `else` *e2*   (p, e1, e2 are expressions)
 
 Type : pred : bool; e1 : t; e2 : t  =>  if `pred` then `e1` else `e2` : t
 
