@@ -1,4 +1,4 @@
-## Language
+# Language
 
 eg. ML, Lambda Calculus, RegExp, Python
 
@@ -15,81 +15,82 @@ We define language constructs like this:
 **Dynamics**: ...
 
 
-### Language Constructs - Syntax
+## Language Constructs - Syntax
 
 How to write it down.
 
 
-### Language Constructs - Semantics
+## Language Constructs - Semantics
 
 What it means (consists of static and dynamic semantics).
 
 
-#### Static Semantics
+### Static Semantics
 
 How to get (check) its type, and how it affects the static environment.
 
 
-#### Dynamic Semantics (Evaluation Rules)
+### Dynamic Semantics (Evaluation Rules)
 
 How to get its value, and how it affects the dynamic environment.
 
 
-### Names
+## Names
 
 We use bind things to names so we can refer to them using names instead of repeating the things.
 
-#### Binding
+### Binding
 
 The mapping from a name to the thing it refers to.
 
 
-#### Scope
+### Scope
 
 The region of code where a certain binding is "live" (so the name is available).
 
 
-#### Environment
+### Environment
 
 The set of bindings (so names) available at a certain point in code.
 
 
-##### Static Environment
+#### Static Environment
 
 Mapping from names to types, used in typechecking (and compilation).
 
 
-##### Dynamic Environment
+#### Dynamic Environment
 
 Mapping from names to values, used in evaluation (aka during runtime).
 
 
-### Expression
+## Expression
 
 A language construct that can be evaluated (in an environment) to produce a value (of a certain type).
 
-### Value
+## Value
 
 A piece of runtime data. The result of evaluating an expression.
 
-### Type
+## Type
 
 Set of values.
 
 Types are used to express and enforce relationships between data and operations, to ensure that programs can be run without getting stuck, throwing up, or going wrong.
 
 
-### Function
+## Function
 
 An expression with named holes in it, to be replaced by values of the appropriate type during evaluation.
 
 
-## ML Language Constructs
+
+# ML Language Constructs
 
 Here are some of the basic language constructs as used in ML. These constructs appear (with more or less similar syntax and semantics) in the vast majority of programming languages.
 
 
-### Expression
+## Expression
 
 Expressions are either literal values are made up of smaller expressions.
 
@@ -98,12 +99,12 @@ The only thing that can be done with an expression is to evaluate it (in an envi
 The different types of expressions in ML are the following:
 
 
-#### Literal
+### Literal
 
 Primitive values, written out verbatim in the program.
 
 
-##### Integer Literal
+#### Integer Literal
 
 eg. `42`
 
@@ -116,7 +117,7 @@ A whole number.
 **Dynamics**: value is the integer denoted by the decimal digits
 
 
-##### String Literal
+#### String Literal
 
 e.g. `"Hello, World!"`
 
@@ -131,7 +132,7 @@ A piece of text.
 Note: it's a bit more complex, escape sequences are supported
 
 
-##### List Literal
+#### List Literal
 
 e.g. `[1, 2, 3]`, `["He", "llo"]`, `[]`
 
@@ -142,7 +143,7 @@ e.g. `[1, 2, 3]`, `["He", "llo"]`, `[]`
 **Dynamic**: Cons (e1, Cons (e2, ... Cons (en, nil)))
 
 
-#### Variable (Name)
+### Variable (Name)
 
 e.g. `x`, `length`, `append`, `my_var`, `Cons`
 
@@ -155,7 +156,7 @@ A name to be looked up in the environment.
 **Dynamics** : get `varname`'s value from env
 
 
-#### Conditional
+### Conditional
 
 e.g. `if x = 0 then "zero" else "nonzero"`
 
@@ -168,7 +169,7 @@ Use a boolean value to choose one of two expressions to evaluate.
 **Dynamics** : if *pred* evaluates to `true` then evaluate *e1*, otherwise evaluate *e2*
 
 
-#### Function Application
+### Function Application
 
 eg. `length "hello"`
 
@@ -182,7 +183,7 @@ Evaluate the argument, then evaluate the function body in the environment at its
 **Dynamics** : ??
 
 
-#### Infix Operator Application
+### Infix Operator Application
 
 eg. `2 + 3`
 
@@ -195,7 +196,7 @@ Apply the operator to the operands.
 **Dynamics**: evaluate e1 and e2, apply op to them
 
 
-#### Let Expression
+### Let Expression
 
 eg. `let x = (39 + 1) in x + 2 end`
 
@@ -208,7 +209,7 @@ Evaluate the expression in an environment extended with some bindings.
 **Dynamics**: add the bindings to the env, evaluate e
 
 
-### Binding
+## Binding
 
 To "bind something to a name" means "to attach a name to something". Like putting a tag on it.
 
@@ -220,7 +221,7 @@ Later, when we use the name, the (static) type and (dynamic) value bound to the 
 The region of code where the environment is extended with the binding - where the name is visible - is called the binding's (variable's) scope.
 
 
-#### Identifier (syntax only)
+### Identifier (syntax only)
 
 eg. `x`, `length`, `my_var`, `list`, `SOME`, `Option`
 
@@ -229,7 +230,7 @@ Syntactic names for stuff (variables, functions, types, modules, etc), usually a
 **Syntax** : "[A-Za-z_][A-Za-z0-9_]*"
 
 
-#### Value Binding
+### Value Binding
 
 `val x = 42`
 
@@ -244,7 +245,7 @@ Bind an expression to a name.
 **Dynamics**:
 
 
-#### Function Binding
+### Function Binding
 
 `fun f x = x + 1`
 
@@ -259,7 +260,7 @@ Bind a function to a name.
 **Dynamics** : - the env after the binding is extended with "`funname` = <fn>"
 
 
-### Top Level
+## Top Level
 
 The Top Level (at the root of an SML file) is a list of bindings.
 
