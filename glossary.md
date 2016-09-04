@@ -8,11 +8,11 @@ Defines the set of possible strings (programs, code) in the language, and how to
 We define language constructs like this:
 
 
-Syntax: (see EBNF)
+**Syntax**: (see EBNF)
 
-Statics: preconditions => postconditions
+**Statics**: preconditions => postconditions
 
-Dynamics: ...
+**Dynamics**: ...
 
 
 ### Language Constructs - Syntax
@@ -109,11 +109,11 @@ eg. `42`
 
 A whole number.
 
-Syntax: `~?[0-9]+`
+**Syntax**: `~?[0-9]+`
 
-Statics: has type int
+**Statics**: has type int
 
-Dynamics: value is the integer denoted by the decimal digits
+**Dynamics**: value is the integer denoted by the decimal digits
 
 
 ##### String Literal
@@ -122,11 +122,11 @@ e.g. `"Hello, World!"`
 
 A piece of text.
 
-Syntax: `".*"`
+**Syntax**: `".*"`
 
-Statics: has type string
+**Statics**: has type string
 
-Dynamics: value is the string denoted by the characters between quotes
+**Dynamics**: value is the string denoted by the characters between quotes
 
 Note: it's a bit more complex, escape sequences are supported
 
@@ -135,11 +135,11 @@ Note: it's a bit more complex, escape sequences are supported
 
 e.g. `[1, 2, 3]`, `["He", "llo"]`, `[]`
 
-Syntax : `[` *e1* (`,` *e2* ... )? )? `]`
+**Syntax** : `[` *e1* (`,` *e2* ... )? )? `]`
 
-Statics : e1 : t; e2 : t; ...  =>  [e1, e2, ...] : list of t
+**Statics**: e1 : t; e2 : t; ...  =>  [e1, e2, ...] : list of t
 
-Dynamic : Cons (e1, Cons (e2, ... Cons (en, nil)))
+**Dynamic**: Cons (e1, Cons (e2, ... Cons (en, nil)))
 
 
 #### Variable (Name)
@@ -148,24 +148,24 @@ e.g. `x`, `length`, `append`, `my_var`, `Cons`
 
 A name to be looked up in the environment.
 
-Syntax : *varname*  (varname is an identifier)
+**Syntax** : *varname*  -- *varname* is an identifier
 
-Static : get `varname`'s type from env
+**Statics**: get `varname`'s type from env
 
-Dynamic : get `varname`'s value from env
+**Dynamics** : get `varname`'s value from env
 
 
 #### Conditional
 
 e.g. `if x = 0 then "zero" else "nonzero"`
 
-Do either one thing or another, depending on a boolean value.
+Use a boolean value to choose one of two expressions to evaluate.
 
-Syntax : `if` *pred* `then` *e1* `else` *e2*   (p, e1, e2 are expressions)
+**Syntax** : `if` *pred* `then` *e1* `else` *e2*  -- (*pred*, *e1*, *e2* are expressions)
 
-Type : pred : bool; e1 : t; e2 : t  =>  if `pred` then `e1` else `e2` : t
+**Statics** : *pred* : bool; *e1* : *t*; *e2* : *t*  =>  (if *pred* then *e1* else *e2*) : *t*
 
-Value : if pred evaluates to `true` then evaluate e1, otherwise evaluate e2
+**Dynamics** : if *pred* evaluates to `true` then evaluate *e1*, otherwise evaluate *e2*
 
 
 #### Function Application
@@ -175,11 +175,11 @@ eg. `length "hello"`
 "Apply the function to the argument" means the following:
 Evaluate the argument, then evaluate the function body in the environment at its definition extended by binding the argument value to the argument name.
 
-Syntax : f e  (f and e are expressions)
+**Syntax**: *f* *e*  (*f* and *e* are expressions)
 
-Static : f : a -> b; e : a  ==>  f e : b
+**Static**: *f* : *a* -> *b*; *e* : *a*  ==>  *f* *e* : *b*
 
-Dynamic : ??
+**Dynamics** : ??
 
 
 #### Infix Operator Application
@@ -188,11 +188,11 @@ eg. `2 + 3`
 
 Apply the operator to the operands.
 
-Syntax : e1 op e2  (e1, e2 are expressions, op is an operator)
+**Syntax**: e1 op e2  (e1, e2 are expressions, op is an operator)
 
-Static : op : a * b -> c; e1 : a ; e2 : b  =>  e1 op e2 : c
+**Statics**: op : a * b -> c; e1 : a ; e2 : b  =>  e1 op e2 : c
 
-Dynamic : evaluate e1 and e2, apply op to them
+**Dynamics**: evaluate e1 and e2, apply op to them
 
 
 #### Let Expression
@@ -201,11 +201,11 @@ eg. `let x = (39 + 1) in x + 2 end`
 
 Evaluate the expression in an environment extended with some bindings.
 
-Syntax : "let" bindings "in" e "end"  (bindings is a list of bindings, e is an expression)
+**Syntax**: "let" bindings "in" e "end"  (bindings is a list of bindings, e is an expression)
 
-Static : the env is extended with the bindings
+**Statics**: the env is extended with the bindings
 
-Dynamic : add the bindings to the env, evaluate e
+**Dynamics**: add the bindings to the env, evaluate e
 
 
 ### Binding
@@ -226,7 +226,7 @@ eg. `x`, `length`, `my_var`, `list`, `SOME`, `Option`
 
 Syntactic names for stuff (variables, functions, types, modules, etc), usually alphanumeric.
 
-Syntax : "[A-Za-z_][A-Za-z0-9_]*"
+**Syntax** : "[A-Za-z_][A-Za-z0-9_]*"
 
 
 #### Value Binding
@@ -235,11 +235,13 @@ Syntax : "[A-Za-z_][A-Za-z0-9_]*"
 
 Bind an expression to a name.
 
-Syntax: "val" valname "=" e  (valname is an identifier, e is )
+**Syntax**: "val" valname "=" e  (valname is an identifier, e is )
 
-Statics:
+**Statics**:
   - e : t => `valname` : t
   - "`valname` : t" is added to the static environment
+
+**Dynamics**:
 
 
 #### Function Binding
@@ -248,21 +250,21 @@ Statics:
 
 Bind a function to a name.
 
-Syntax: 'fun' funname argname '=' e  (funname and argname are identifiers, e is an exp)
+**Syntax**: 'fun' funname argname '=' e  (funname and argname are identifiers, e is an exp)
 
-Type: x : a, e : b  =>  `funname` : a -> b
+**Statics**: x : a, e : b  =>  `funname` : a -> b
           - the env inside `e` is extended with "`argname` : a"
           - the env after the function binding is extended with "`funname` : a -> b"
 
-Dynamic : - the env after the binding is extended with "`funname` = <fn>"
+**Dynamics** : - the env after the binding is extended with "`funname` = <fn>"
 
 
 ### Top Level
 
 The Top Level (at the root of an SML file) is a list of bindings.
 
-Syntax : bindings
+**Syntax**: bindings
 
-Static : each binding is typechecked in order
+**Statics**: each binding is typechecked in order
 
-Dynamic : each binding is evaluated in order
+**Dynamics**: each binding is evaluated in order
