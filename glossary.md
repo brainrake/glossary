@@ -12,7 +12,7 @@ We define language constructs like this:
 
 **Statics**: premises ⊢ conclusions
 
-**Dynamics**: eval (*construct* *args*) = ...
+**Dynamics**: `eval (*construct* *args*) = ...`
 
 
 ## Language Constructs - Syntax
@@ -135,7 +135,7 @@ Here are some of the basic language constructs, simplified from ML. These constr
 
 ## Expression
 
-Expressions are either literal values are made up of smaller expressions.
+Expressions are either literal values, variables, or made up of smaller expressions.
 
 The only thing that can be done with an expression is to evaluate it (in an environment), and the result is a value (of a certain type).
 
@@ -332,7 +332,7 @@ Bind a function closure to a name.
 
 where *funname* and *argname* are identifiers, and *e* is an expression
 
-**Statics**: *x* : *t1*, *e* : *t2*  ⊢ env_extend (*funname* : *t1* -> *t2*)
+**Statics**: env_extend (*argname* : *t1*); *e* : *t2*  ⊢ env_extend (*funname* : *t1* -> *t2*)
 
 **Dynamics** : `eval (funbinding (funname, argname, e)) = env_extend (funname, make_closure (env, argname, e))`
 
