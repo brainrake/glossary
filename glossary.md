@@ -212,7 +212,7 @@ eg. `let x = (39 + 1) in x + 2 end`
 
 Evaluate the expression in an environment extended with some bindings.
 
-**Syntax**: "let" *bindings* "in" *e* "end"  -- *bindings* is a list of bindings, *e* is an expression)
+**Syntax**: `let` *bindings* `in` *e* `end`  -- *bindings* is a list of bindings, *e* is an expression)
 
 **Statics**: *e* is typechecked in an environment extended with *bindings*
 
