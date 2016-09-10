@@ -140,7 +140,7 @@ Expressions are either literal values, variables, or made up of smaller expressi
 The only thing that can be done with an expression is to evaluate it (in an environment), and the result is a value (of a certain type).
 
 
-**Syntax**: *e* := *lambda* | *apply* | *infixapply* | *var* | *if* | *let* | *lit* | *list*
+**Syntax**: *exp* := *lambda* | *apply* | *infixapply* | *var* | *if* | *let* | *lit* | *list*
 
 
 
@@ -154,13 +154,13 @@ We'll also need the bindings that are used in the function but defined outside i
 
 Closures can be named, used as arguments, and most importantly, evaluated by applying to arguments, in order to produce a value.
 
-**Syntax**: *lambda* := `fn` *argname* `=>` *e*
+**Syntax**: *lambda* := `fn` *argname* `=>` *exp*
 
-where *argname* is a name, *e* is an expression
+where *argname* is a name, *exp* is an expression
 
-**Statics**: env_extend (*argname* : *t1); *e* : t2 ⊢ *lambda* : *t1* -> *t2*
+**Statics**: env_extend (*argname* : *t1); *exp* : t2 ⊢ *lambda* : *t1* -> *t2*
 
-**Dynamics**: `eval (lambda (argname, e)) = make_closure (env, argname, e)`
+**Dynamics**: `eval (lambda (argname, exp)) = make_closure (env, argname, e)`
 
 
 ### Function Application (Lambda Elimination, Apply, Function Call)
@@ -172,11 +172,11 @@ Function application "fills the hole" in a closure (binds the argument name to t
 So to evaluate a function application, that is "to apply the function to the argument", means the following:
 Evaluate the argument, then evaluate the function body in the environment at its definition extended by binding the argument value to the argument name.
 
-**Syntax**: *apply* := *f* *e*
+**Syntax**: *apply* := *f* *exp*
 
-where *f* and *e* are expressions
+where *f* and *exp* are expressions
 
-**Static**: *f* : *t1* -> *t2*; *e* : *t1*  ⊢  *f* *e* : *t2*
+**Static**: *f* : *t1* -> *t2*; *exp* : *t1*  ⊢  *f* *exp* : *t2*
 
 **Dynamics** : ??
 
@@ -185,15 +185,17 @@ where *f* and *e* are expressions
 
 eg. `2 + 3`
 
-Apply the operator to the operands.
+Apply the operator to the arguments.
+
+An operator is a function with a special name (usually symbols like `+` `*` `^` `/` , written between the two arguments ("infix") instead of before ("prefix").
 
 **Syntax**: *infixapply* := *exp1* *op* *exp2*
 
 where *exp1*, *exp2* are expressions, *op* is an operator
 
-**Statics**: *op* : *t1* * *t2* -> *t3*; *e1* : *t1* ; *e2* : *t2*  ⊢  *e1* *op* *e2* : *t3*
+**Statics**: *op* : *t1* * *t2* -> *t3*; *exp1* : *t1* ; *exp2* : *t2*  ⊢  *exp1* *op* *exp2* : *t3*
 
-**Dynamics**: `eval (infixapply (op, e1, e2)) = op (eval *e1*, eval *e2*)`
+**Dynamics**: `eval (infixapply (exp1, op exp2)) = op (eval *exp1*, eval *exp2*)`
 
 
 ### Variable (Name)
@@ -217,13 +219,13 @@ e.g. `if x = 0 then "zero" else "nonzero"`
 
 Use a boolean value to choose one of two expressions to evaluate.
 
-**Syntax** : *if* := `if` *pred* `then` *e1* `else` *e2*
+**Syntax** : *if* := `if` *pred* `then` *exp1* `else` *exp2*
 
-where *pred*, *e1*, *e2* are expressions
+where *pred*, *exp1*, *exp2* are expressions
 
-**Statics** : *pred* : bool; *e1* : *t*; *e2* : *t*  ⊢ if (*pred*, *e1*, *e2*) : *t*
+**Statics** : *pred* : bool; *exp1* : *t*; *exp2* : *t*  ⊢ if (*pred*, *exp1*, *exp2*) : *t*
 
-**Dynamics** : `eval (if (pred, e1, e2)) = if (eval pred == true) then eval e1 else eval e2`
+**Dynamics** : `eval (if (pred, exp1, exp2)) = if (eval pred == true) then eval exp1 else eval exp2`
 
 
 ### Let Expression
@@ -232,11 +234,11 @@ eg. `let x = (39 + 1) in x + 2 end`
 
 Evaluate the expression in an environment extended with some bindings.
 
-**Syntax**: *let* := `let` *bindings* `in` *e* `end`  -- *bindings* is a list of bindings, *e* is an expression)
+**Syntax**: *let* := `let` *bindings* `in` *exp* `end`  -- *bindings* is a list of bindings, *exp* is an expression)
 
-**Statics**: *e* is typechecked in an environment extended with *bindings*
+**Statics**: *exp* is typechecked in an environment extended with *bindings*
 
-**Dynamics**: *e* is evaluated in an environment extended with *bindings*
+**Dynamics**: *exp* is evaluated in an environment extended with *bindings*
 
 
 ### Literal
@@ -280,13 +282,13 @@ Note: it's a bit more complex, escape sequences are supported.
 
 e.g. `[1, 2, 3]`, `["He", "llo"]`, `[]`
 
-**Syntax** : *litlist* := `[` ( *e1* ( `,` *e2* ... )? )? `]`
+**Syntax** : *litlist* := `[` ( *exp1* ( `,` *exp2* ... )? )? `]`
 
-where *e1*, *e2*, ... are expressions
+where *exp1*, *exp2*, ... are expressions
 
-**Statics**: *e1* : *t*; *e2* : *t*; ...  ⊢  [e1, e2, ...] : list of *t*
+**Statics**: *exp1* : *t*; *exp2* : *t*; ...  ⊢  [exp1, exp2, ...] : list of *t*
 
-**Dynamic**: `eval (litlist (e1, e2, ...)) = Cons (eval *e1*, Cons (eval *e2* ... , nil ...)))`
+**Dynamic**: `eval (litlist (exp1, exp2, ...)) = Cons (eval *exp1*, Cons (eval *exp2* ... , nil ...)))`
 
 
 ## Binding
@@ -313,11 +315,11 @@ An identifier is the syntax for writing down names for stuff (variables, functio
 
 Bind an expression to a name.
 
-**Syntax**: *valbinding* := `val` *valname* `=` *e*
+**Syntax**: *valbinding* := `val` *valname* `=` *exp*
 
-where *valname* is an identifier, *e* is an expression
+where *valname* is an identifier, *exp* is an expression
 
-**Statics**: *e* : *t* ⊢ env_extend (*valname* : *t*)
+**Statics**: *exp* : *t* ⊢ env_extend (*valname* : *t*)
 
 **Dynamics**: `eval (valbining (valname, e)) = env_extend (valname, eval e)`
 
@@ -328,13 +330,13 @@ where *valname* is an identifier, *e* is an expression
 
 Bind a function closure to a name.
 
-**Syntax**: *funbinding* ='fun' *funname* *argname* '=' *e*
+**Syntax**: *funbinding* ='fun' *funname* *argname* '=' *exp*
 
-where *funname* and *argname* are identifiers, and *e* is an expression
+where *funname* and *argname* are identifiers, and *exp* is an expression
 
-**Statics**: env_extend (*argname* : *t1*); *e* : *t2*  ⊢ env_extend (*funname* : *t1* -> *t2*)
+**Statics**: env_extend (*argname* : *t1*); *exp* : *t2*  ⊢ env_extend (*funname* : *t1* -> *t2*)
 
-**Dynamics** : `eval (funbinding (funname, argname, e)) = env_extend (funname, make_closure (env, argname, e))`
+**Dynamics** : `eval (funbinding (funname, argname, exp)) = env_extend (funname, make_closure (env, argname, exp))`
 
 
 ## List of Bindings
