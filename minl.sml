@@ -1,12 +1,15 @@
-(*
-Our Language MinL
-*)
+(* Our Language, MinL *)
 
-datatype Val = ValBool of bool
-             | ValInt of int
-             | ValStr of string
+datatype Sum = Left of Val | Right of Val
+
+and      Val = Error of string
              | Closure of (Val -> Val) (* pass env through host language closure *)
-             | Error of string
+             | Sum of Sum
+             | Product of (Val * Val)
+             | Unit
+             | Bool of bool
+             | Int of int
+             | Str of string
 
 datatype Exp = Lambda of (string * Exp)
              | Apply of (Exp * Exp)
@@ -35,48 +38,37 @@ fun eval (env: Env) (exp : Exp) : Val = case exp of
                        | _ => Error ("can only apply closures") end
   | Var name => lookup env name
   | If (pred, exp1, exp2) => (
-      case eval env pred of ValBool true => eval env exp1
-                          | ValBool false => eval env exp2
+      case eval env pred of Bool true => eval env exp1
+                          | Bool false => eval env exp2
                           | _ => Error "predicate must be boolean")
   | Let (name, exp1, exp2) =>
       let val newenv = (name, eval env exp1) :: env
       in eval newenv exp2 end
   | Literal value => value
 
+fun show (v : Val) = case v of
+     Error s => "Error: " ^ s
+   | Closure f => "<fn>"
+   | Sum sum => (case sum of
+       (Left v) => "(Left " ^ show v ^ ")"
+     | (Right v) => "(Right " ^ show v ^ ")")
+   | Product (fst, snd) => "(" ^ show fst ^ ", " ^ show snd ^ ")"
+   | Unit => "()"
+   | Bool b => if b then "True" else "False"
+   | Int i => Int.toString i
+   | Str s => s
 
-(*
-the language's standard environment
-*)
 
-fun plus_ml x y = x + y
+(* MinL Standard Environment *)
 
 val plus = Closure (fn x => Closure (fn y =>
-  case (x, y) of (ValInt vx, ValInt vy) => ValInt (vx + vy)
-               | (_, _) => Error "arguments to plus must be ValInts"))
+  case (x, y) of (Int vx, Int vy) => Int (vx + vy)
+               | (_, _) => Error "arguments to plus must be Ints"))
 
 val stdenv = [("plus", plus)]
 
-(*
-an example expression
-*)
 
-(* the expression in ML *)
-val result_ml  =
-  let val twice = fn x => plus_ml x x
-  in twice 3 end
-
-(* the same expression in MinL *)
-val exp =
-  Let ((*val*) "twice", (*=*) (Lambda ("x", (Apply (Apply (Var "plus", Var "x"), Var "x")))),
-       (*in*) (Apply (Var "twice", Literal (ValInt 3))) (*end*))
-
-(* evaluate the expression in MinL *)
-val result = eval stdenv exp
-
-
-(*
-parser
-*)
+(* parser *)
 
 fun parse_one ts =
   if null ts
@@ -96,7 +88,7 @@ fun parse_one ts =
            val (exp, rest) = parse (tl (tl (tl ts)))
        in (Lambda (argname, exp), rest) end
   else if isSome (Int.fromString (hd ts))
-  then (Literal (ValInt (valOf (Int.fromString (hd ts)))), tl ts)
+  then (Literal (Int (valOf (Int.fromString (hd ts)))), tl ts)
   else if Char.isAlpha (hd (explode (hd ts)))
   then (Var (hd ts), tl ts)
   else (Literal (Error ("unknown token: " ^ hd ts)), ts)
@@ -117,13 +109,15 @@ fun tokenize str =
 
 fun compileStr str = #1 (parse (tokenize str))
 
-val exp' = compileStr "let twice = fn x => plus x x in let thrice = fn x => plus x (twice x) in thrice 3"
-
-val result' = eval stdenv exp'
-
 fun compileFile filename =
   compileStr (TextIO.inputAll (TextIO.openIn filename))
 
-val exp'' = compileFile "test.minl"
+val args = CommandLine.arguments()
+val filename = if null args then "test.minl" else hd args
 
-val result'' = eval stdenv exp''
+val exp = compileFile filename
+
+val result = eval stdenv exp
+
+val _ = print ((show result) ^ "\n")
+val _ = OS.Process.exit(OS.Process.success)
