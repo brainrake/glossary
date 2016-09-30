@@ -1,12 +1,23 @@
 # Language
 
-eg. ML, Lambda Calculus, RegExp, Python
+eg. ML, Lambda Calculus, RegExp, Python, XML
 
-Collection of language constructs (which consist of syntax and semantics).
-Defines the set of possible strings (programs, code) in the language, and how to combine smaller (parts of) programs into larger ones.
+A Language is defined through a set of language constructs that specify how to write down strings (programs) in the language, and what they mean. Larger (pieces) of language strings
+
+The set of possible correct strings (programs, code) in the language are all the combinations of language
+
+## Programming Language
+
+A language used to express data (information) and computation (transformation of information), usually meant to be run on a computer.
+
+TODO: Turing
+
+
+## Language Construct
+
+Consists of Syntax and Semantics.
 
 We define language constructs like this:
-
 
 **Syntax**: *construct* := ... [EBNF](https://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_Form) ...
 
@@ -15,24 +26,24 @@ We define language constructs like this:
 **Dynamics**: `eval (construct (args...)) = ...`
 
 
-## Language Constructs - Syntax
+### Syntax
 
-How to write it down.
-
-
-## Language Constructs - Semantics
-
-What it means (consists of static and dynamic semantics).
+How to write a construct down.
 
 
-### Static Semantics (Typechecking Rules, Statics)
+### Semantics
 
-How to get (check) its type, and how it affects the static environment.
+What a construct means (consists of static and dynamic semantics).
 
 
-### Dynamic Semantics (Evaluation Rules, Dynamics)
+###$ Static Semantics (Typechecking Rules, Statics)
 
-How to get its value, and how it affects the dynamic environment.
+How to get (check) a construct's type, and how it affects the static environment.
+
+
+#### Dynamic Semantics (Evaluation Rules, Dynamics)
+
+How to get a construct's value, and how it affects the dynamic environment.
 
 
 ## Names (Variables)
@@ -44,9 +55,9 @@ We bind things to names so we can refer to them using names instead of repeating
 
 The mapping from a name to the thing it refers to.
 
-To "bind something to a name" means "to attach a name to something". Like putting a name tag on it.
+To "bind something to a name" means "to attach a name to something". Like putting a post-it note with a name on it.
 
-We usually bind expressions (including functions) and their types to names so we can use them later by name, without having to type them again and again.
+We usually bind values (including functions) and their types to names so we can use them later by name, without having to type them again and again.
 
 A binding (a variable definition) is used to extend a (static and dynamic) environment.
 Later, when we use the name, the (static) type and (dynamic) value bound to the name can be looked up in the environment.
@@ -88,20 +99,18 @@ A piece of runtime data. The result of evaluating an expression.
 
 Set of values.
 
-Types are used to express and enforce relationships between data and operations, to ensure that programs can be run without getting stuck, throwing up, or going wrong.
+Types are used to express and enforce relationships between data and operations, to ensure (through formal logical proof) that programs will run without getting stuck, throwing up, or going wrong.
 
 
 ## Function
 
-An expression with "free" (unbound) names.
-The names will be bound during evaluation, at the point of use (function application).
+An expression bundled together with a name (the "argument").
+The argument will be bound during evaluation, at the point of use (function application).
 
 
 ## Closure
 
 A function bundled together with the environment at the point where the function is defined.
-
-In this document, we will use `make_closure (env, argname, expression)` to denote the above in dynamics.
 
 
 ## Execution Phases
