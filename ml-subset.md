@@ -9,9 +9,7 @@ Expressions are either literal values, variables, or made up of smaller expressi
 
 The only thing that can be done with an expression is to evaluate it (in an environment), and the result is a value (of a certain type).
 
-
 **Syntax**: *exp* := *lambda* | *apply* | *infixapply* | *var* | *if* | *let* | *lit* | *list*
-
 
 
 ### Function Defintion (Lambda Abstraction, Lambda)
@@ -81,6 +79,8 @@ where *varname* is an identifier
 **Statics**: ⊢ env_lookup *varname*
 
 **Dynamics** : `eval (var (varname)) = env_lookup varname
+
+where **env_lookup** looks up the (type or value) bound to an name in the (static or dynamic) environment
 
 
 ### Conditional
@@ -185,13 +185,15 @@ An identifier is the syntax for writing down names for stuff (variables, functio
 
 Bind an expression to a name.
 
-**Syntax**: *valbinding* := `val` *valname* `=` *exp*
+**Syntax**: *valbinding* := `val` *name* `=` *exp*
 
-where *valname* is an identifier, *exp* is an expression
+where *name* is an identifier, *exp* is an expression
 
-**Statics**: *exp* : *t* ⊢ env_extend (*valname* : *t*)
+**Statics**: *exp* : *t* ⊢ env_extend (*name* : *t*)
 
-**Dynamics**: `eval (valbining (valname, e)) = env_extend (valname, eval e)`
+**Dynamics**: `eval (valbining (name, e)) = env_extend (name, eval e)`
+
+where **env_extend** extends the (static or dynamic) environment by binding **name** (to a type or value)
 
 
 ### Function Binding
@@ -200,13 +202,15 @@ where *valname* is an identifier, *exp* is an expression
 
 Bind a function closure to a name.
 
-**Syntax**: *funbinding* ='fun' *funname* *argname* '=' *exp*
+**Syntax**: *funbinding* ='fun' *name* *argname* '=' *exp*
 
-where *funname* and *argname* are identifiers, and *exp* is an expression
+where *name* and *argname* are identifiers, and *exp* is an expression
 
-**Statics**: env_extend (*argname* : *t1*); *exp* : *t2*  ⊢ env_extend (*funname* : *t1* -> *t2*)
+**Statics**: env_extend (*argname* : *t1*); *exp* : *t2*  ⊢ env_extend (*name* : *t1* -> *t2*)
 
-**Dynamics** : `eval (funbinding (funname, argname, exp)) = env_extend (funname, make_closure (env, argname, exp))`
+**Dynamics** : `eval (funbinding (name, argname, exp)) = env_extend (name, make_closure (env, argname, exp))`
+
+where **env_extend** extends the (static or dynamic) environment by binding **name** (to a type or value)
 
 
 ## List of Bindings
