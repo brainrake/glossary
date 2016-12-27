@@ -11,7 +11,7 @@ Note: in fact, most programming languages are [Turing complete](https://en.wikip
 
 ### Dynamic Scope
 
-With [dynamic scope](https://en.wikipedia.org/wiki/Dynamic_scope#Dynamic_scoping), functions are evaluated in the environment at the point of use. Thus the meaning of variable and function names used inside a function can change depending on where the function was called from.
+With [dynamic scope](https://en.wikipedia.org/wiki/Dynamic_scope#Dynamic_scoping), names in functions are looked up in the environment where the function is called, not where it is defined. Thus the meaning of a function names can change depending on where it was called from.
 
 The `this` or `self` keyword in many OOP languages is a restricted form of dynamic scope, it refers to the object on which the method was called. Its problems are somewhat less severe, and more noticeable in dynamic languages.
 
@@ -37,7 +37,9 @@ With [manual memory management](https://en.wikipedia.org/wiki/Manual_memory_mana
 
 All variables, at any time, can have the value [`Null`](https://en.wikipedia.org/wiki/Null_pointer) (in addition to the usual possible values for variables of that type). This can be used to indicate a missing/empty value.
 
-**Why we thought it's good:** It was easy to implement. That's it. [Seriously](https://en.wikipedia.org/wiki/Null_pointer#History).
+**Why we thought it's good:**
+- historically, it is the most straightforward, fast, low level way to signal a missing value or failure, distinguishable from a valid memory address if one cared to check
+- It was easy to implement. [Seriously](https://en.wikipedia.org/wiki/Null_pointer#History).
 
 **Why it's bad:** Almost any evaluation can result in a `Null` value, which, when used, will cause runtime errors like [`NullPointerException`](https://en.wikipedia.org/wiki/Null_pointer#Dereferencing) and incorrect results that only show up later in the computation and have to be traced back to where they are caused. The only way to eliminate the possibility of errors caused by `Null` is to check the result of *every* computation and handle the case where it is `Null` appropriately.
 
@@ -53,14 +55,14 @@ Instead of simple values, variables in imperative programming are like boxes (me
 **Why it's bad:**
 - in general, it is impossible to find out what value a name refers to, or where a certain value "came from", that is, which part of the program put it in the box
 - the behavior of a piece of code can be changed from the outside in undefined, accidental or malicious ways
-- the order of evaluation can change result of computations
+- the order and number of times a piece of code is evaluated can change result
 - concurrent programs are very hard to write and require careful synchronization of the different computations to prevent severe problems like [race conditions](https://en.wikipedia.org/wiki/Race_condition#Software) and [deadlocks](https://en.wikipedia.org/wiki/Deadlock)
 - all of the above allow undefined behaviour, unintended (accidental or malicious) changes in the behaviour of a piece of code from the outside, incorrect results, and security breaches
 - the only way a programmer can completely avoid accidental or malicious mutation is to manually create copies of *every* value before passing it to a function or assigning it to a variable
 
 **What to use instead:**
 - immutable data with [pure functions](https://en.wikipedia.org/wiki/Pure_function). They have the exact same expressive power, and one can *always* trace where any value comes from, and what any name refers to. They also make compiler optimizations and garbage collection easier. With modern compilers, processor and memory use of pure computations with immutable data is as good as with mutable computations.
-- if necessary, algorithms can be written in an imperative manner by using safe local mutation, e.g. by sequencing operations on `Option` types, or the [ST Monad](https://en.wikipedia.org/wiki/Haskell_features#ST_monad)
+- if necessary, algorithms can be written in an imperative manner by using safe local mutation, e.g. by sequencing operations on `Option` types, or using the [ST Monad](https://en.wikipedia.org/wiki/Haskell_features#ST_monad)
 - [uniqueness types](https://en.wikipedia.org/wiki/Uniqueness_type) allow safe overwriting and reuse of memory by ensuring that there are no references to the old data (that was overwritten). E.g. in [Rust](https://doc.rust-lang.org/book/ownership.html) and [Idris](http://docs.idris-lang.org/en/latest/reference/uniqueness-types.html).
 
 
@@ -76,8 +78,9 @@ Instead of functions that just compute a result from the arguments, procedures/m
 **Why it's bad:**
 - procedures can have different results when called with the same arguments, depending on the state of the world outside them, making it hard to think about their results
 - procedures can _modify_ the state of the world outside them, making it hard to track the interactions between different parts of a program
+- _any_ part of a program may communicate with the outside world, making it hard to track the interaction between the program and the world
 - the number of times and the order in which code is executed can change the result
-- testing is irritatingly hard, e.g. just to test some networking code, you have to mock (implement part of) the network API and modify your code to work with exchangeable networking components
+- testing is irritatingly hard, e.g. just to test some networking code, you have to implement part of (aka mock) the network API and modify your code to work with exchangeable networking components
 - sometimes testing is impossible, e.g. when you can't modify parts of the system
 - writing concurrent programs is hard and leads to many difficult to track down bugs, see [thread safety](https://en.wikipedia.org/wiki/Thread_safety)
 
@@ -115,7 +118,7 @@ Instead of checking that functions and values are used in compatible ways _befor
 
 **Why we thought they're good:**
 - no need to write down types - the type of each variable and expression is stored along with its value during runtime
-- no type errors during compilation (most dynamic languages don't have a separate compilation step)
+- no type errors during compilation (dynamic languages usually don't have a separate compilation step)
 - sometimes programs can be expressed more concisely
 - easier to implement
 - internals of language features can be easier to expose and override, allowing easier metaprogramming
@@ -130,7 +133,7 @@ Instead of checking that functions and values are used in compatible ways _befor
 - runtime type errors can not be avoided, only mitigated by manually checking the types of arguments of _all_ functions we define, and handling exceptions (see above)
 
 **What to use instead:**
-- [static types](https://en.wikipedia.org/wiki/Type_system#STATIC) give us the strongest guarantee of the absence of runtime errors and exceptions: a formal logical proof extracted from the program by the type checker
+- [static types](https://en.wikipedia.org/wiki/Type_system#STATIC) give us the strongest guarantee of the absence of runtime exceptions: a formal logical proof extracted from the program by the type checker
 - since we already proved the correct use of values and functions, there is no need to keep type information around during runtime, so the compiler throws it away, increasing performance
 - with [type inference](https://en.wikipedia.org/wiki/Type_inference), we don't have to write down types in static languages, so this apparent advantage disappears.
 
