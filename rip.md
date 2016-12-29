@@ -4,7 +4,7 @@ At some point in history we thought the following programming language concepts 
 
 It turned out they are not good ideas. In their unrestricted forms, they cause undefined behavior (resulting in errors, crashes, incorrect results, security breaches) and intractable complexity.
 
-Besides automating brittle processes, a common theme is that we simply get rid of some features, thereby reducing the number of possible execution paths of programs, often exponentially, to the point where the meaning of each piece can be understood by looking at that piece in isolation, and bigger pieces are built of smaller pieces in the most straightforward way. The programmer doesn't have to think about a huge number of ways a piece of code might fail, because it can't. The result is robust, correct software, increased productivity, and more help from the computer during development, because it has a better idea of what we are trying to do.
+Besides automating brittle processes, a common theme is that we simply get rid of some features, thereby reducing the number of possible execution paths of programs, often exponentially, to the point where the meaning of each piece can be understood by looking at that piece in isolation, and bigger pieces are built of smaller pieces in the most straightforward way. The programmer doesn't have to think about a huge number of ways a piece of code might (mis)behave, because it can't. The result is robust, correct software, increased productivity, and more help from the computer during development, because it has a better idea of what we are trying to do.
 
 Note: in fact, most programming languages are [Turing complete](https://en.wikipedia.org/wiki/Turing_completeness) so they can express the exact same computations, only differently.
 
