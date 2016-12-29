@@ -15,7 +15,7 @@ With [dynamic scope](https://en.wikipedia.org/wiki/Dynamic_scope#Dynamic_scoping
 
 The `this` or `self` keyword in many OOP languages is a restricted form of dynamic scope, it refers to the object on which the method was called. Its problems are somewhat less severe, and more noticeable in dynamic languages.
 
-**Why we thought it's good:** The meaning of a function can change depending on the environment where it is used, making it possible to extend functionality later.
+**What we thought it's good for:** The meaning of a function can change depending on the environment where it is used, making it possible to extend functionality later.
 
 **Why it's bad:** The meaning of a function can change  depending on the environment where it is used, in uncontrollable ways, allowing unintended (accidental or malicious) changes in the behaviour of a piece of code from the outside, resulting in errors, incorrect results, and security breaches. The function author can do nothing to prevent this, except give the variables unusual names and hope for the best.
 
@@ -26,7 +26,7 @@ The `this` or `self` keyword in many OOP languages is a restricted form of dynam
 
 With [manual memory management](https://en.wikipedia.org/wiki/Manual_memory_management), the allocation and deallocation of memory for data is requested from the operating system manually.
 
-**Why we thought it's good:** In the very early days of computing, garbage collectors were thought to introduce a large overhead. Manual Memory management was the default, as it allows fine-grained control over when and where and how much allocation and deallocation is done.
+**What we thought it's good for:** In the very early days of computing, garbage collectors were thought to introduce a large overhead. Manual Memory management was the default, as it allows fine-grained control over when and where and how much allocation and deallocation is done.
 
 **Why it's bad**: Managing memory manually is a tedious and error-prone process. Doing it incorrectly causes [a wide range of memory errors](https://en.wikipedia.org/wiki/Memory_safety#Types_of_memory_errors) leading to data corruption and even overwriting of the executable code, allowing severe security breaches like remote code execution.
 
@@ -39,7 +39,7 @@ With [manual memory management](https://en.wikipedia.org/wiki/Manual_memory_mana
 
 All variables, at any time, can have the value [`Null`](https://en.wikipedia.org/wiki/Null_pointer) (in addition to the usual possible values for variables of that type). This can be used to indicate a missing/empty value.
 
-**Why we thought it's good:**
+**What we thought it's good for:**
 - historically, it was the most straightforward, fast, low level way to signal a missing value or failure, distinguishable from a valid memory address (pointer) if one cared to check
 - It was easy to implement. [Seriously](https://en.wikipedia.org/wiki/Null_pointer#History).
 
@@ -72,7 +72,7 @@ Instead of simple values, variables in imperative programming are like boxes (me
 
 Instead of functions that just compute a result from the arguments and can do nothing else, procedures/methods in imperative programming can have [side effects](https://en.wikipedia.org/wiki/Side_effect_(computer_science)) like accessing and manipulating system resources and mutable state defined outside them.
 
-**Why we thought it's good:**
+**What we thought it's good for:**
 - it is the way the [underlying architecture](https://en.wikipedia.org/wiki/Von_Neumann_architecture) of modern processors works
 - it is the traditional way of interacting with the outside world - how else would we communicate on the network or show things on the screen?
 - it is the traditional way of using a computer's memory - making a new variable every time would use up all memory pretty soon
@@ -152,11 +152,11 @@ We distinguish between nominal subtyping (it's a subtype because I say so) and s
 
 The difference between subtyping and polymorphism is somewhat subtle but becomes important in the difficult cases (as usual). [TODO: details]
 
-** Why we thought it's good:**
+**What we thought it's good for:**
 - extensibility and reuse
 - [TODO]
 
-** Why it's bad:**
+**Why it's bad:**
 - it fails at extensibility and reuse because type systems sometimes "forget" that a value is actually of a subtype and treat it as being of the supertype [TODO: info]
 - when mixed with mutability and other side effects, it is impossible in general to rule out inconsistencies [TODO: info], resulting in runtime type errors (crashes, security breaches) or safety but lack of extensibility and reuse [TODO: SML subtyping example]
 - TODO: covariance vs contravariance
@@ -172,7 +172,7 @@ Inheritance is a form of subtyping where [TODO].
 
 [TODO] : way to organize concepts in a logical system, reuse
 
-**Why we thought it's good:**
+**What we thought it's good for:**
 - extensibility, reuse
 - [TODO]
 
@@ -202,7 +202,7 @@ Inheritance is a form of subtyping where [TODO].
 
 OOP usually combines imperative programming (so mutability and side effects), subtyping in the form of inheritance, a limited form of dynamic scope (`this`), and `Null`,
 
-**Why we thought it's good:**
+**What we thought it's good for:**
 - it is similar to the intuitive idea of interactions beetween physical objects: objects have an internal state and can act on and be acted upon by other objects
 - the lure of reuse through inheritance of data and behavior
 - it promises to help reuse by hiding implementation details through encapsulation (private class members)
