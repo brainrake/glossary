@@ -30,7 +30,9 @@ With [manual memory management](https://en.wikipedia.org/wiki/Manual_memory_mana
 
 **Why it's bad**: Managing memory manually is a tedious and error-prone process. Doing it incorrectly causes [a wide range of memory errors](https://en.wikipedia.org/wiki/Memory_safety#Types_of_memory_errors) leading to data corruption and even overwriting of the executable code, allowing severe security breaches like remote code execution.
 
-**What to use instead:**: Automatic memory management, usually [garbage collection](https://en.wikipedia.org/wiki/Garbage_collection_(computer_science))
+**What to use instead:**:
+- automatic memory management, usually [garbage collection](https://en.wikipedia.org/wiki/Garbage_collection_(computer_science)) or [reference counting]() [TODO]
+- where performance is crucial, uniqueness types (aka affine types, ownership) can provide safe reuse of memory with no runtime overhead [TODO: regularize]
 
 
 ### Null
@@ -38,12 +40,12 @@ With [manual memory management](https://en.wikipedia.org/wiki/Manual_memory_mana
 All variables, at any time, can have the value [`Null`](https://en.wikipedia.org/wiki/Null_pointer) (in addition to the usual possible values for variables of that type). This can be used to indicate a missing/empty value.
 
 **Why we thought it's good:**
-- historically, it is the most straightforward, fast, low level way to signal a missing value or failure, distinguishable from a valid memory address if one cared to check
+- historically, it was the most straightforward, fast, low level way to signal a missing value or failure, distinguishable from a valid memory address (pointer) if one cared to check
 - It was easy to implement. [Seriously](https://en.wikipedia.org/wiki/Null_pointer#History).
 
 **Why it's bad:** Almost any evaluation can result in a `Null` value, which, when used, will cause runtime errors like [`NullPointerException`](https://en.wikipedia.org/wiki/Null_pointer#Dereferencing) and incorrect results that only show up later in the computation and have to be traced back to where they are caused. The only way to eliminate the possibility of errors caused by `Null` is to check the result of *every* computation and handle the case where it is `Null` appropriately.
 
-**What to use instead:** [Algebraic Data Types](https://en.wikipedia.org/wiki/Algebraic_data_type) describe all possible values of a variable, and can not be `Null`. To encode the possibility of a "missing" or "empty" value, use an [Option type](https://en.wikipedia.org/wiki/Option_type), which requires the handling of the empty case at some point, so it can never cause undefined behavior or exceptions.
+**What to use instead:** [Algebraic Data Types](https://en.wikipedia.org/wiki/Algebraic_data_type) describe all possible values of a variable, and can not be `Null`. To encode the possibility of a "missing" or "empty" value, use an [Option type](https://en.wikipedia.org/wiki/Option_type), which requires the handling of the empty case at some point, so it can never cause undefined behavior or exceptions. Option types can be implemented with null references, with no runtime overhead.
 
 
 ### Mutation
@@ -68,7 +70,7 @@ Instead of simple values, variables in imperative programming are like boxes (me
 
 ### Side Effects
 
-Instead of functions that just compute a result from the arguments, procedures/methods in imperative programming can have [side effects](https://en.wikipedia.org/wiki/Side_effect_(computer_science)) like accessing and manipulating resources and mutable state defined outside them.
+Instead of functions that just compute a result from the arguments and can do nothing else, procedures/methods in imperative programming can have [side effects](https://en.wikipedia.org/wiki/Side_effect_(computer_science)) like accessing and manipulating system resources and mutable state defined outside them.
 
 **Why we thought it's good:**
 - it is the way the [underlying architecture](https://en.wikipedia.org/wiki/Von_Neumann_architecture) of modern processors works
@@ -87,19 +89,19 @@ Instead of functions that just compute a result from the arguments, procedures/m
 **What to use instead:** pure functions and immutable data with effects described as data and executed by the language runtime, e.g.:
 - if you're stuck in an imperative language, keep all points of contact with the outside world in one place (e.g. `main`), and write everything else as [referentially transparent](https://en.wikipedia.org/wiki/Referential_transparency) functions that transform data - "functional core, reactive shell"
 - simple effects producing input messages [as in Elm](https://guide.elm-lang.org/architecture/effects/)
-- IO monad [as in Haskell](https://en.wikipedia.org/wiki/Monad_(functional_programming)#The_I.2FO_monad)
-- algebraic effects [as in Idris](http://docs.idris-lang.org/en/latest/effects/introduction.html)
+- the IO monad [as in Haskell](https://en.wikipedia.org/wiki/Monad_(functional_programming)#The_I.2FO_monad)
+- using dependent effects [as in Idris](http://docs.idris-lang.org/en/latest/effects/depeff.html), you can enforce correct usage of resources (e.g. not reading a file before it's open) _at compile time_
 
 
 ### Runtime Exceptions
 
-When an operation fails (e.g. a file was not found, a network connection closed, or an element in a list was not found), instead of _returning_ a value indicating failure, a [https://en.wikipedia.org/wiki/Exception_handling#Exception_handling_in_software](runtime exception) is _thrown_, and execution flow jumps out and over one or more method returns to the nearest enclosing `try/catch` block which can can handle the specific exception - called a _non-local return_. If there there is no such handler, exceptions are usually caught at the top level by the language runtime, after which they are displayed to the user and the program terminates.
+When an operation fails (e.g. a file was not found, a network connection closed, or an element in a list was not found), instead of _returning_ a value indicating failure, a [runtime exception](https://en.wikipedia.org/wiki/Exception_handling#Exception_handling_in_software) is _thrown_, and execution flow jumps out and over one or more procedure returns to the nearest enclosing `try/catch` block which can can handle the specific exception - called a _non-local return_. If there there is no such handler, exceptions are usually caught at the top level by the language runtime, after which they are displayed to the user and the program terminates.
 
-[Checked exceptions](https://en.wikipedia.org/wiki/Exception_handling#Checked_exceptions) are a small improvement, requiring the programmer to declare that a method can throw a certain exception, or handle it.
+[Checked exceptions](https://en.wikipedia.org/wiki/Exception_handling#Checked_exceptions) are a small improvement, requiring the programmer to declare that a procedure can throw a certain exception, or handle it.
 
 **Why we thought they're good:**
 - they seem like a flexible tool for handling failure
-- can not be avoided in the case of dynamic languages while keeping the language practical
+- can not be avoided in the case of dynamically typed languages while keeping the language practical, since almost all operations can fail; see next section
 
 **Why they're bad:**:
 - they introduce complexity by creating an exponential number of hidden execution paths
@@ -108,8 +110,8 @@ When an operation fails (e.g. a file was not found, a network connection closed,
 - an unhandled error and the resulting program crash with a long and unintelligible error message is exceptionally bad user experience
 
 **What to use instead:**
-- Algebraic data types, specifically [`Option`](https://en.wikipedia.org/wiki/Option_type) to indicate possible failure with no additional information, or `Result` (aka `Error`, `Either`) to describe different ways an operation can fail or provide more information about the failure.
-- safe, contained non-local returns can be described by sequencing operations on `Option` types, or using an Error Monad or Exception Effect
+- Algebraic data types, specifically [`Option`](https://en.wikipedia.org/wiki/Option_type) to indicate possible failure (with no additional information), or `Result` (aka `Error`, `Either`) to describe different ways an operation can fail or provide more information about the failure.
+- safe, contained non-local returns can be described by sequencing (nested) operations on `Option` types, or using an Error Monad or Exception Effect
 
 
 ### Dynamic Types
@@ -135,33 +137,70 @@ Instead of checking that functions and values are used in compatible ways _befor
 **What to use instead:**
 - [static types](https://en.wikipedia.org/wiki/Type_system#STATIC) give us the strongest guarantee of the absence of runtime exceptions: a formal logical proof extracted from the program by the type checker
 - since we already proved the correct use of values and functions, there is no need to keep type information around during runtime, so the compiler throws it away, increasing performance
-- with [type inference](https://en.wikipedia.org/wiki/Type_inference), we don't have to write down types in static languages, so this apparent advantage disappears.
+- with [type inference](https://en.wikipedia.org/wiki/Type_inference), we don't have to write down types in static languages, so this apparent advantage of dynamic languages disappears.
 
-Note: Adding type annotations to top-level functions is recommended even in languages that can infer them, to help humans read the code and to make type errors more precise. However, since the type checker already knows the types, this can be done automatically (e.g. with a keyboard combo). In the other direction, with Type Driven Development, we write down the types first, and the compiler completes parts of the program for us.
+Note: Adding type annotations to top-level functions is recommended even in languages that can infer them, to help humans read the code and to make type errors more precise. However, since the type checker already knows the types, this can be done automatically (e.g. with a keyboard combo in your editor). In the other direction, with Type Driven Development, we write down the types first, and the compiler completes parts of the program for us.
+
+Note: an interesting exception to this section are programs that are only ever run once, like expressions in the purely functional Nix language used by the [Nix package manager]() [TODO: link]. All inputs to a Nix expression are know when it is evaluated, so if it produces a result once (a software package or operating system configuration), it will always produce the same result. If it works, it's safe to distribute and will work for everyone, forever (provided all the inputs are available, i.e. Github is not down).
+
+
+### Subtyping
+
+Subtyping [TODO: link] is a transitive relationship between types stating that wherever a value of a certain (super)type is expected, a value of a subtype thereof should also be accepted.
+
+We distinguish between nominal subtyping (it's a subtype because I say so) and structural subtyping (it's a subtype because it is made of the same parts plus some extra stuff that I don't care about right now). The latter is more beningn, though not without its problems.
+
+The difference between subtyping and polymorphism is somewhat subtle but becomes important in the difficult cases (as usual). [TODO: details]
+
+** Why we thought it's good:**
+- extensibility and reuse
+- [TODO]
+
+** Why it's bad:**
+- it fails at extensibility and reuse because type systems sometimes "forget" that a value is actually of a subtype and treat it as being of the supertype [TODO: info]
+- when mixed with mutability and other side effects, it is impossible in general to rule out inconsistencies [TODO: info], resulting in runtime type errors (crashes, security breaches) or safety but lack of extensibility and reuse [TODO: SML subtyping example]
+- TODO: covariance vs contravariance
+
+**What to use instead:**
+- (sub)structural polymorphism aka row polymorphism aka polymorphic (extensible) records
+- composable interfaces
 
 
 ### Inheritance
 
+Inheritance is a form of subtyping where [TODO].
+
 [TODO] : way to organize concepts in a logical system, reuse
 
 **Why we thought it's good:**
-- reuse
+- extensibility, reuse
 - [TODO]
 
 
 **Why it's bad:**
-- hierarchies in the world around us and everyday life are based on containment/ownership, not inheritance
-- fail at reuse, safety
-- logic fail
-- multiple inheritance is impossible to deal with correctly in general
+- hierarchies in the natural world and everyday life are based on containment/ownership, not inheritance
+- fail at reuse, safety [TODO]
+- logic fail [TODO]
+- inheriting _all_ of a parent's data and behavior prevents proper abstraction (so reuse and extensibility), resulting in the need for complex mechanisms (with an astonighing number of combinations) for
+  - information hiding (`private`, `protected`, `public`, `friend`),
+  - where combined with mutability, a way to restrict data access (`getter`s and `setter`s)
+  - ways to require or prevent the overloading of methods (`virtual`, `final`)
+  - in the case of class-based inheritance, the distinction between class-level and object-level data and methods (`static`)
+- even with all this machinery, it is impossible to define a container (e.g. list) type that can hold different kinds of values (e.g. a list of numbers or a list of `Animal`s) without generics
+- generics, combined with inheritance-based subtyping and especially mutability, are unsafe (I can put a `Dog` in a list of `Cat`s, because they're both a subcalss of `Animal`s) [TODO: double check]
+- multiple inheritance is impossible to deal with correctly in general, and where attempted, leads to incomprehensible complexity
 - [TODO]
 
-**What to use instead**: parametric polymorphism, polymorphic (extensible) records, composition of interfaces
+**What to use instead**:
+- parametric polymorphism
+- polymorphic (extensible) records
+- composable interfaces
+- if you're stuck in an OO language, use as little inheritance as possible, and use interfaces and a "contain and delegate" strategy (instead of inheriting, create a member variable of the desired type and marshall method calls to it)
 
 
 ### Object Oriented Programming
 
-OOP usually combines imperative programming (so mutability and side effects), inheritance, a limited form of dynamic scope (`this`), and `Null`.
+OOP usually combines imperative programming (so mutability and side effects), subtyping in the form of inheritance, a limited form of dynamic scope (`this`), and `Null`,
 
 **Why we thought it's good:**
 - it is similar to the intuitive idea of interactions beetween physical objects: objects have an internal state and can act on and be acted upon by other objects
@@ -171,7 +210,7 @@ OOP usually combines imperative programming (so mutability and side effects), in
 - [TODO]
 
 
-**Why it's bad:** (in addition to the points from each component)**:**
+**Why it's bad** (in addition to the points from each component)**:**
 - tightly couples data and behavior, leading to more difficult extensibility or reuse of either
 - objects usually have mutable state, which may be changed by any piece of code with a reference to the object
 - breaks encapsulation in several ways, eg. superclasses are not well encapsulated from subclasses
@@ -181,6 +220,31 @@ OOP usually combines imperative programming (so mutability and side effects), in
 [TODO] [see](https://medium.com/@cscalfani/goodbye-object-oriented-programming-a59cda4c0e53#.m7x1zvrc2)
 
 **What to use instead:** **functional programming** with algebraic data types, polymorphic records, immutable data, pure functions, and reuse through composition of functions and interfaces.
+
+
+### Decorators, Macros, Templates, Code Generation
+
+These "advanced" programming features go above and beyond the normal programming experience to achieve fancy concepts such as "generic programming" and "metaprogramming", usually by circumventing the language itself.
+
+**Why we thought they're good:**
+- generic programming, metaprogramming, DSLs
+
+**Why they're bad:**
+- decorators/annotations/properties modify a method or class by adding pre- or postconditions and in other ways; higher order functions can do all that without introducing an extra language feature or overhead
+- "hygienic" macros (those that don't accidentally override the variable names in your functions and change their meaning) are notoriously hard to implement
+- macros in general are very hard to impossible to implement in a type safe manner
+- templates, code generation, and often macros work at the source code level, turning your language (and not even that, since there is usually a separate macro language) into a glorified text processor and throwing the type system out the window in the process
+- given the "flexibility" (i.e. lack of structure and meaning) of the above techniques, the compiler and language tools can do little to help with what you're trying to achieve; error messages are nonsensical and require deep familiarity with the techniques, implementation details, and attempted way of use of the techniques in question to have any hope of debugging them, breaking abstraction and reuse
+
+**What to use instead:**
+- higher order functions
+- interfaces
+- dependent types
+- type providers
+- Domain Specific Languages
+- error reflection
+- idiom brackets
+- if this stuff is too far out, just stick with "normal" (non-meta) programming
 
 
 ### Testing
@@ -196,7 +260,7 @@ Tests are small pieces of code that we write to run pieces of our actual code wi
 
 **What to use** in addition to and instead of tests**:**
 - static types make a large fraction of tests unnecessary, mainly those that check for correct use of types and correct handling of type-related errors
-- property-based testing, aka [QuickCheck](https://hackage.haskell.org/package/QuickCheck) aka [fuzz testing](http://package.elm-lang.org/packages/elm-community/elm-test/latest) tests your code with randomly-generated input and checks that the specified correctness properties are satisfied. failing inputs can be "shrunk" until a minimal failing case is found.
+- property-based testing, aka [QuickCheck](https://hackage.haskell.org/package/QuickCheck) aka [fuzz testing](http://package.elm-lang.org/packages/elm-community/elm-test/latest) tests code with randomly-generated input and checks that the specified correctness properties are satisfied. failing inputs can be "shrunk" until a minimal failing case is found.
 - with [Domain Driven Design](http://fsharpforfunandprofit.com/ddd/) and [Type Driven Development](http://tomasp.net/blog/type-first-development.aspx/), we describe the logical structure of our problem in the domain language, by first writing down its type, which is also a specification for the solution. [Type, Define, Refine [pdf]](https://manning-content.s3.amazonaws.com/download/1/dc78582-0565-472e-a2dc-b88af151b064/Brady_TDDwithIdris_MEAP_V13_ch1.pdf), see Chapter 1.2.
 - with a rich enough type system (e.g. [dependent types](https://en.wikipedia.org/wiki/Dependent_type), a type can be given that is so precise as to make it impossible to write an incorrect program; combine with TDD for full benefits
 
@@ -209,11 +273,11 @@ From the introduction video:
 
 > This course is about an opportunity to learn the fundamental concepts of programming languages and we're going to do it in a way that will, I believe, make you a better programmer in any programming language. And in fact, in programming languages that we're not even going to use during this course. The idea is really to learn the ideas around which every programming language is built and understand precisely the different ideas that we use when we program, and how those ideas are expressed in lots of different programming languages.
 
-Part A of the course will also teach you everything you need to know to get started with functional programming and algebraic types, so you can move on to the next step below. I recommend Part B and Part C as well, because it will give you a deep understanding of dynamic languages and OOP, and the differences between approaches.
+Part A of the course will also teach you everything you need to know to get started with type safe functional programming, so you can move on to the next step below. I recommend Part B and Part C as well, because it will give you a deep understanding of dynamic languages and OOP, and the differences between approaches.
 
 **If you're already somewhat comfortable** with functional programming and algebraic data types, you're ready to write cool interactive apps in a delightfully simple language called [Elm](http://elm-lang.org/).
 
-Follow the [introduction guide](https://guide.elm-lang.org/) and you'll be writing applications with rich user interfaces, animation, network connectivity, and so on, that never throw runtime exceptions, in a very short time. Elm is also ridiculously easy to [integrate with Javascript](https://guide.elm-lang.org/interop/javascript.html).
+Follow the [introduction guide](https://guide.elm-lang.org/) and you'll be writing applications with rich user interfaces, graphics, animation, networking, and so on, that never throw runtime exceptions, in a very short time. Elm is also safe and ridiculously easy to [integrate with Javascript](https://guide.elm-lang.org/interop/javascript.html).
 
 **If you want to write native or backend apps**, you will need to learn a bit more, because managing system resources like files, buffers, and network connections is tricky in general.
 
@@ -230,5 +294,5 @@ For safe, high performance, low level software with zero-cost abstractions, try 
 **If you want to get a glimpse of the future** and try the most advanced type system in a real-world usable language, check out [Idris](http://docs.idris-lang.org/en/latest/tutorial/introduction.html). It is a language with dependent types, meaning types are normal values, and functions can take and return them. It has some mind-bending features that will have impact for decades to come. The language itself is mostly ready for prime time, but there are not many libraries available yet.
 
 **What's missing?**
-- A functional database. [Datomic](http://www.datomic.com/) fits the bill, but it's not open source.
-- A backend language that can be recommended without reservations.
+- a functional database. [Datomic](http://www.datomic.com/) fits the bill, but it's not open source.
+- a backend language that can be recommended without reservations.
